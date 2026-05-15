@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOMO — Czy Twój telefon rządzi Twoim życiem?</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --yellow: #FFE135;
+  --pink: #FF3CAC;
+  --blue: #3C91E6;
+  --green: #06D6A0;
+  --orange: #FF6B35;
+  --dark: #0a0a0f;
+  --card: #13131a;
+  --border: #2a2a3a;
+  --text: #f5f0ff;
+  --muted: #888899;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--dark);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 40px;
+  background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 2px;
+  color: var(--yellow);
+}
+
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--yellow); }
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 120px 24px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 50%, rgba(255,60,172,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 400px at 80% 30%, rgba(60,145,230,0.1) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 300px at 60% 80%, rgba(255,225,53,0.08) 0%, transparent 70%);
+}
+
+.hero-tag {
+  display: inline-block;
+  background: rgba(255,225,53,0.12);
+  color: var(--yellow);
+  border: 1px solid rgba(255,225,53,0.3);
+  padding: 8px 20px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.hero h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3.5rem, 10vw, 8rem);
+  line-height: 0.95;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.hero h1 .line-pink { color: var(--pink); }
+.hero h1 .line-yellow { color: var(--yellow); }
+.hero h1 .line-blue { color: var(--blue); }
+
+.hero-sub {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--muted);
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.hero-sub strong { color: var(--text); font-weight: 800; }
+
+.scroll-hint {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.scroll-hint::after {
+  content: '↓';
+  font-size: 1.5rem;
+  color: var(--yellow);
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+.emoji-float {
+  position: absolute;
+  font-size: 2.5rem;
+  animation: floatAround 6s ease-in-out infinite;
+  pointer-events: none;
+  user-select: none;
+}
+.e1 { top: 15%; left: 8%; animation-delay: 0s; }
+.e2 { top: 25%; right: 10%; animation-delay: 1s; font-size: 3rem; }
+.e3 { bottom: 25%; left: 12%; animation-delay: 2s; }
+.e4 { bottom: 20%; right: 8%; animation-delay: 0.5s; font-size: 2rem; }
+.e5 { top: 60%; left: 5%; animation-delay: 1.5s; font-size: 2rem; }
+
+@keyframes floatAround {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-20px) rotate(5deg); }
+  66% { transform: translateY(10px) rotate(-5deg); }
+}
+
+.stats-strip {
+  background: var(--yellow);
+  padding: 20px 40px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.stats-ticker {
+  display: inline-block;
+  animation: ticker 25s linear infinite;
+  color: var(--dark);
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.05em;
+}
+
+.stats-ticker span { margin: 0 48px; }
+.stats-ticker .dot { color: var(--pink); }
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+section {
+  padding: 100px 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+
+.tag-pink { background: rgba(255,60,172,0.12); color: var(--pink); border: 1px solid rgba(255,60,172,0.25); }
+.tag-blue { background: rgba(60,145,230,0.12); color: var(--blue); border: 1px solid rgba(60,145,230,0.25); }
+.tag-green { background: rgba(6,214,160,0.12); color: var(--green); border: 1px solid rgba(6,214,160,0.25); }
+.tag-orange { background: rgba(255,107,53,0.12); color: var(--orange); border: 1px solid rgba(255,107,53,0.25); }
+
+.section-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.section-lead {
+  font-size: 1.1rem;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 600px;
+  margin-bottom: 56px;
+}
+
+.fomo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 700px) { .fomo-grid { grid-template-columns: 1fr; } }
+
+.fomo-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px;
+  transition: transform 0.3s, border-color 0.3s;
+}
+
+.fomo-card:hover { transform: translateY(-4px); }
+.fomo-card.pink:hover { border-color: var(--pink); }
+.fomo-card.blue:hover { border-color: var(--blue); }
+.fomo-card.green:hover { border-color: var(--green); }
+.fomo-card.yellow:hover { border-color: var(--yellow); }
+
+.fomo-card .card-emoji { font-size: 3rem; margin-bottom: 16px; display: block; }
+.fomo-card h3 { font-size: 1.2rem; font-weight: 800; margin-bottom: 10px; }
+.fomo-card p { font-size: 0.95rem; color: var(--muted); line-height: 1.6; }
+
+.fomo-card.big {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 40px;
+}
+
+@media (max-width: 700px) { .fomo-card.big { flex-direction: column; } }
+
+.fomo-card.big .big-emoji { font-size: 6rem; flex-shrink: 0; }
+.fomo-card.big h3 { font-size: 1.5rem; margin-bottom: 12px; }
+.fomo-card.big p { font-size: 1rem; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  margin-bottom: 56px;
+}
+
+.stat-card {
+  background: var(--dark);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  transition: transform 0.3s;
+}
+
+.stat-card:hover { transform: translateY(-4px); }
+
+.stat-number {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.stat-card:nth-child(1) .stat-number { color: var(--yellow); }
+.stat-card:nth-child(2) .stat-number { color: var(--pink); }
+.stat-card:nth-child(3) .stat-number { color: var(--blue); }
+.stat-card:nth-child(4) .stat-number { color: var(--green); }
+.stat-label { font-size: 0.9rem; color: var(--muted); line-height: 1.5; font-weight: 600; }
+
+.symptoms-list { display: flex; flex-direction: column; gap: 16px; }
+
+.symptom-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.symptom-item:hover { transform: translateX(8px); }
+.symptom-item:nth-child(odd):hover { border-color: var(--pink); }
+.symptom-item:nth-child(even):hover { border-color: var(--blue); }
+
+.symptom-icon { font-size: 2rem; flex-shrink: 0; margin-top: 2px; }
+.symptom-item h4 { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
+.symptom-item p { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.tip-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  transition: transform 0.3s;
+  position: relative;
+}
+
+.tip-card:hover { transform: translateY(-6px); }
+
+.tip-number {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 4rem;
+  line-height: 1;
+  position: absolute;
+  top: 16px; right: 24px;
+}
+
+.tip-card:nth-child(1) .tip-number { color: var(--yellow); opacity: 0.3; }
+.tip-card:nth-child(2) .tip-number { color: var(--pink); opacity: 0.3; }
+.tip-card:nth-child(3) .tip-number { color: var(--blue); opacity: 0.3; }
+.tip-card:nth-child(4) .tip-number { color: var(--green); opacity: 0.3; }
+.tip-card:nth-child(5) .tip-number { color: var(--orange); opacity: 0.3; }
+.tip-card:nth-child(6) .tip-number { color: var(--yellow); opacity: 0.3; }
+
+.tip-emoji { font-size: 2rem; margin-bottom: 14px; display: block; }
+.tip-card h4 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
+.tip-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+.quiz-strip {
+  background: linear-gradient(135deg, var(--pink), var(--orange));
+  border-radius: 24px;
+  padding: 56px 48px;
+  text-align: center;
+  margin: 80px auto;
+  max-width: 1100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.quiz-strip::before {
+  content: '📱';
+  position: absolute;
+  font-size: 12rem;
+  opacity: 0.08;
+  right: -20px; top: -20px;
+  transform: rotate(15deg);
+}
+
+.quiz-strip h2 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: white;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.quiz-strip p {
+  color: rgba(255,255,255,0.8);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+footer {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 48px 40px;
+  text-align: center;
+}
+
+footer .footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  color: var(--yellow);
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+footer p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+footer strong { color: var(--text); }
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">FOMO.PL</div>
+  <ul class="nav-links">
+    <li><a href="#czym-jest">FOMO</a></li>
+    <li><a href="#statystyki">Statystyki</a></li>
+    <li><a href="#objawy">Objawy</a></li>
+    <li><a href="#porady">Co zrobić</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <span class="emoji-float e1">📱</span>
+  <span class="emoji-float e2">😰</span>
+  <span class="emoji-float e3">🔔</span>
+  <span class="emoji-float e4">💀</span>
+  <span class="emoji-float e5">👀</span>
+  <div class="hero-tag">⚠️ Projekt — Innowacje Społeczne</div>
+  <h1>
+    <span class="line-pink">CZY TWÓJ</span><br>
+    <span class="line-yellow">TELEFON</span><br>
+    <span class="line-blue">RZĄDZI TOBĄ?</span>
+  </h1>
+  <p class="hero-sub">
+    Sprawdzasz telefon <strong>średnio 96 razy dziennie.</strong> Budzisz się — telefon. Zasypiasz — telefon. To nie jest normalne. Ale jesteś tu w dobrym miejscu.
+  </p>
+  <div class="scroll-hint">Przewiń i sprawdź</div>
+</div>
+
+<div class="stats-strip">
+  <div class="stats-ticker">
+    <span>📱 Polak spędza 4h 37min dziennie na telefonie</span>
+    <span class="dot">◆</span>
+    <span>😰 FOMO dotyka 69% millenialsów</span>
+    <span class="dot">◆</span>
+    <span>🔔 Średnio 96 odblokowań telefonu dziennie</span>
+    <span class="dot">◆</span>
+    <span>😴 71% Polaków sprawdza telefon przed snem</span>
+    <span class="dot">◆</span>
+    <span>📱 Polak spędza 4h 37min dziennie na telefonie</span>
+    <span class="dot">◆</span>
+    <span>😰 FOMO dotyka 69% millenialsów</span>
+    <span class="dot">◆</span>
+    <span>🔔 Średnio 96 odblokowań telefonu dziennie</span>
+    <span class="dot">◆</span>
+    <span>😴 71% Polaków sprawdza telefon przed snem</span>
+    <span class="dot">◆</span>
+  </div>
+</div>
+
+<section id="czym-jest">
+  <div class="fade-in">
+    <span class="section-tag tag-pink">Czym jest FOMO?</span>
+    <h2 class="section-title">Fear Of Missing Out</h2>
+    <p class="section-lead">FOMO to lęk przed tym, że coś Cię omija — impreza, news, trend, rozmowa. I właśnie ten lęk sprawia, że nie możesz odłożyć telefonu.</p>
+  </div>
+  <div class="fomo-grid fade-in">
+    <div class="fomo-card big pink">
+      <div class="big-emoji">🧠</div>
+      <div>
+        <h3>Skąd to się bierze?</h3>
+        <p>FOMO to zjawisko psychologiczne opisane po raz pierwszy w 2004 roku. Nasze mózgi są zaprojektowane do bycia częścią grupy — wykluczenie społeczne kiedyś oznaczało śmierć. Social media wykorzystują ten mechanizm i serwują nam niekończący się strumień "życia innych", który sprawia, że nasze własne wydaje się nudne i niewystarczające.</p>
+      </div>
+    </div>
+    <div class="fomo-card blue">
+      <span class="card-emoji">📲</span>
+      <h3>Social media jako paliwo</h3>
+      <p>Instagram, TikTok i Snapchat są dosłownie zaprojektowane tak, żebyś wracał/a po więcej. Powiadomienia, lajki, stories — każde z nich to mały zastrzyk dopaminy dla Twojego mózgu.</p>
+    </div>
+    <div class="fomo-card green">
+      <span class="card-emoji">🔄</span>
+      <h3>Błędne koło</h3>
+      <p>Sprawdzasz telefon bo się boisz, że coś ominiesz. Widzisz posty innych. Czujesz się gorzej. Sprawdzasz znowu. I tak w kółko — bez końca.</p>
+    </div>
+    <div class="fomo-card yellow">
+      <span class="card-emoji">🎭</span>
+      <h3>Porównywanie się</h3>
+      <p>W social mediach wszyscy pokazują najlepszą wersję siebie. Porównujesz swoje codzienne życie z cudzymi "highlight reel" — i zawsze przegrywasz.</p>
+    </div>
+    <div class="fomo-card pink">
+      <span class="card-emoji">🎓</span>
+      <h3>Studenci szczególnie narażeni</h3>
+      <p>Nowe środowisko, presja społeczna, chęć przynależności — studia to idealne warunki do rozwinięcia FOMO. Badania pokazują, że 80% studentów doświadcza go regularnie.</p>
+    </div>
+  </div>
+</section>
+
+<div id="statystyki" style="padding: 0 24px;">
+  <section style="padding: 100px 60px; background: #0d0d14; border-radius: 32px; max-width: 1100px; margin: 0 auto;">
+    <div class="fade-in">
+      <span class="section-tag tag-blue">Liczby nie kłamią</span>
+      <h2 class="section-title">Skala problemu</h2>
+      <p class="section-lead">Myślisz, że przesadzamy? Sprawdź co mówią badania.</p>
+    </div>
+    <div class="stats-grid fade-in">
+      <div class="stat-card">
+        <div class="stat-number">4h 37'</div>
+        <div class="stat-label">tyle czasu dziennie przeciętny Polak spędza na smartfonie</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">96×</div>
+        <div class="stat-label">tyle razy dziennie przeciętny użytkownik odblokowuje telefon</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">69%</div>
+        <div class="stat-label">millenialsów deklaruje, że doświadcza FOMO regularnie</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">71%</div>
+        <div class="stat-label">Polaków sprawdza telefon tuż przed zaśnięciem</div>
+      </div>
+    </div>
+    <div class="fade-in" style="background: var(--dark); border: 1px solid var(--border); border-radius: 20px; padding: 32px; margin-top: 8px;">
+      <p style="font-size: 1rem; line-height: 1.8; color: var(--muted);">
+        📊 <strong style="color: var(--text);">Źródła:</strong> DataReportal Digital 2024 Report, Journal of Social and Clinical Psychology, American Psychological Association, GUS Badanie Społeczeństwa Informacyjnego 2023.
+      </p>
+    </div>
+  </section>
+</div>
+
+<section id="objawy">
+  <div class="fade-in">
+    <span class="section-tag tag-orange">Rozpoznaj to u siebie</span>
+    <h2 class="section-title">Objawy FOMO i uzależnienia</h2>
+    <p class="section-lead">Czy któreś z tych zachowań brzmi znajomo? Bez oceniania — sprawdź po prostu.</p>
+  </div>
+  <div class="symptoms-list fade-in">
+    <div class="symptom-item">
+      <div class="symptom-icon">😱</div>
+      <div>
+        <h4>Panika bez telefonu</h4>
+        <p>Czujesz niepokój, rozdrażnienie lub pustkę gdy nie masz przy sobie telefonu lub bateria się kończy. Ten stan nazywa się nomofobią i dotyka już ponad połowę użytkowników smartfonów.</p>
+      </div>
+    </div>
+    <div class="symptom-item">
+      <div class="symptom-icon">🌙</div>
+      <div>
+        <h4>Telefon to pierwsze i ostatnie co widzisz</h4>
+        <p>Sprawdzasz powiadomienia jeszcze w łóżku, przed wstaniem. I tuż przed zaśnięciem. Niebieskie światło ekranu zaburza produkcję melatoniny i niszczy jakość snu — a Ty i tak nie możesz przestać.</p>
+      </div>
+    </div>
+    <div class="symptom-item">
+      <div class="symptom-icon">🎓</div>
+      <div>
+        <h4>Telefon na wykładzie — "tylko na chwilę"</h4>
+        <p>Otwierasz telefon żeby sprawdzić jedną rzecz. Kiedy odkładasz go, minęło 20 minut. Znasz to uczucie. Badania pokazują, że rozproszenie uwagi przez telefon obniża zdolność zapamiętywania o 30%.</p>
+      </div>
+    </div>
+    <div class="symptom-item">
+      <div class="symptom-icon">👻</div>
+      <div>
+        <h4>Phantom vibration — czujesz wibracje których nie ma</h4>
+        <p>Sięgasz po telefon bo czujesz wibrację — a ekran jest ciemny, żadnego powiadomienia. Ten efekt, znany jako "phantom vibration syndrome", dotyczy aż 89% użytkowników smartfonów.</p>
+      </div>
+    </div>
+    <div class="symptom-item">
+      <div class="symptom-icon">😔</div>
+      <div>
+        <h4>Scrollujesz i czujesz się gorzej — ale scrollujesz dalej</h4>
+        <p>Wiesz, że przeglądanie Instagrama sprawia, że czujesz się źle z siebie. I mimo to nie możesz przestać. To klasyczny objaw behawioralnego uzależnienia — podobny mechanizm jak przy hazardzie.</p>
+      </div>
+    </div>
+    <div class="symptom-item">
+      <div class="symptom-icon">⏰</div>
+      <div>
+        <h4>Tracisz czas którego nie masz</h4>
+        <p>"Tylko 5 minut TikToka" zamienia się w godzinę. Masz zaległości, deadline'y, rzeczy do zrobienia — ale telefon wygrywa. To nie jest kwestia słabej woli. To zaprojektowane uzależnienie.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="quiz-strip fade-in">
+  <h2>💡 Czy wiesz, że...</h2>
+  <p>Aplikacje social media zatrudniają specjalistów od uzależnień, żeby sprawić, że nie będziesz chciał/a wychodzić. To nie Twoja wina — to biznes.</p>
+</div>
+
+<section id="porady">
+  <div class="fade-in">
+    <span class="section-tag tag-green">Co możesz zrobić?</span>
+    <h2 class="section-title">6 kroków do odzyskania kontroli</h2>
+    <p class="section-lead">Nie chodzi o wyrzucenie telefonu. Chodzi o to, żeby to Ty nim rządził/a — nie odwrotnie.</p>
+  </div>
+  <div class="tips-grid fade-in">
+    <div class="tip-card">
+      <div class="tip-number">01</div>
+      <span class="tip-emoji">🌙</span>
+      <h4>Zakaz telefonu 30 min przed snem</h4>
+      <p>Postaw telefon w innym pokoju. Kup budzik za 20 zł. Zobaczysz różnicę w jakości snu już po tygodniu.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-number">02</div>
+      <span class="tip-emoji">🔕</span>
+      <h4>Wyłącz wszystkie powiadomienia social media</h4>
+      <p>Wszystkie. Dosłownie. Możesz sprawdzać gdy chcesz — nie gdy aplikacja tego chce. To ogromna różnica.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-number">03</div>
+      <span class="tip-emoji">⬛</span>
+      <h4>Ustaw ekran w skali szarości</h4>
+      <p>Kolorowe ikony są zaprojektowane żeby przyciągać uwagę. Szary ekran jest nudniejszy — i o to chodzi.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-number">04</div>
+      <span class="tip-emoji">📊</span>
+      <h4>Sprawdź swój czas ekranowy</h4>
+      <p>Ustawienia → Czas przed ekranem. Wynik może Cię zaskoczyć. Świadomość to pierwszy krok do zmiany.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-number">05</div>
+      <span class="tip-emoji">🍽️</span>
+      <h4>Posiłki bez telefonu</h4>
+      <p>Jeden posiłek dziennie bez scrollowania. Smakuje inaczej. Naprawdę. Spróbuj przez tydzień.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-number">06</div>
+      <span class="tip-emoji">🤝</span>
+      <h4>Umów się z kimś — bez telefonów</h4>
+      <p>Powiedz znajomemu "spotkajmy się i nie patrzymy w telefony". Rozmowa bez rozpraszaczy to dziś luksus.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">FOMO.PL</div>
+  <p>Projekt studentów kierunku <strong>Innowacje Społeczne</strong><br>
+  Stworzone żeby pomóc — nie żeby zawstydzić. Wszyscy przez to przechodzimy. 📱</p>
+  <p style="margin-top: 16px; font-size: 0.8rem;">© 2025 — Projekt edukacyjny. Nie jesteśmy terapeutami, ale serio — odłóż telefon na chwilę.</p>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
